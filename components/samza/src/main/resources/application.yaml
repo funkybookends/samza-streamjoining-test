@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: userjoiner
+
+samza:
+  task:
+    inputs: kafka.user-data-byuserid
+    checkpoint.factory: org.apache.samza.checkpoint.file.FileSystemCheckpointManagerFactory
+  stores:
+    my-store:
+      factory: org.apache.samza.storage.kv.KeyValueStorageEngineFactory
+      changelog: kafka.my-store-changelog
+      key.serde: string
+  serializers:
+    registry:
+      string:
+        class: org.apache.samza.serializers.StringSerdeFactory
+  systems:
+    userjoinger:
+      samza:
+        factory: com.salmon.samza.service.UsersService
+      consumer:
+        zookeeper:
+          connect: kafka:9092
+    kafka:
+      samza.factory: org.apache.samza.system.kafka.KafkaSystemFactory
+    consumer.zookeeper.connect: zookeeper:2181
+  app:
+    name: userjoiner
+  class: com.salmon.samza.service.UserStreamApplication
+  job:
+    name: userjoiner
+    coordinator:
+      system: userjoiner
+      zk.connect: kafka:9092

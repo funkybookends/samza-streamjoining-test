@@ -1,0 +1,25 @@
+stores:
+  my-store:
+    factory: org.apache.samza.storage.kv.KeyValueStorageEngineFactory
+    changelog: kafka.my-store-changelog
+    key.serde: string
+
+serializers:
+  registry:
+    string:
+      class: org.apache.samza.serializers.StringSerdeFactory
+
+job:
+  coordinator:
+    system: userjoiner
+
+task:
+  inputs: userjoiner.user.data.byuserid
+
+systems:
+  userjoinger:
+    samza:
+      factor: com.salmon.samza.service.UsersService
+    consumer:
+      zookeeper:
+        connect: kafka:9092

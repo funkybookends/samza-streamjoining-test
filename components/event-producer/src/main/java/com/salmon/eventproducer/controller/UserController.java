@@ -16,7 +16,7 @@ import com.salmon.eventproducer.data.UserData;
 public class UserController
 {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	public static final String USER_TOPIC = "user.data.byuserid";
+	public static final String USER_TOPIC = "user-data-byuserid";
 
 	private final KafkaTemplate<String, String> kafkaTemplate;
 
