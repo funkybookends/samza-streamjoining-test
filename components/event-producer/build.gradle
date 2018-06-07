@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.0.2.RELEASE'
+}
+
+group 'event-producer'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+apply plugin: 'java'
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.2.RELEASE'
+    compile group: 'org.springframework.kafka', name: 'spring-kafka', version: '2.1.6.RELEASE'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+//jar {
+//    baseName = "$moduleName"
+//    manifest {
+//        attributes(
+//              'Implementation-Title': "$moduleName",
+//              'Main-Class' : "com.salmon.eventproducer.Application"
+//        )
+//    }
+//}
+//
+//task fatJar(type: Jar) {
+//    dependsOn(build)
+//    manifest { attributes 'Main-Class': "com.salmon.eventproducer.Application" }
+//    exclude "META-INF/*.SF"
+//    exclude "META-INF/*.DSA"
+//    exclude "META-INF/*.RSA"
+//    baseName = "$moduleName" + "-fatjar"
+//    from {
+//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
+//    with jar
+//}

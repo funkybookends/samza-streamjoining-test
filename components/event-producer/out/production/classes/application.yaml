@@ -1,0 +1,8 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092,192.168.99.100:9092,localhost:2181
+    client-id: event-producer
+    listener:
+      poll-timeout: PT1S
+server:
+  port: 11003

@@ -1,0 +1,8 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    client-id: event-producer
+    listener:
+      poll-timeout: PT1S
+server:
+  port: 11003
