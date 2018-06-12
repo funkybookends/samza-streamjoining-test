@@ -8,30 +8,20 @@ spring:
           default:
             key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
             value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-      bindings:
-        pcout.producer:
-          key-serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-          value-serde: org.apache.kafka.common.serialization.Serdes$LongSerde
-        pcin.consumer:
-          key-serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-          value-serde: org.apache.kafka.common.serialization.Serdes$LongSerde
     bindings:
-      pvout:
-        destination: pvs
-        producer.header-mode: raw
-      pvin:
-        destination: pvs
-        consumer.header-mode: raw
-      pcout:
-        destination: pcs
-        producer.use-native-encoding: true
-      pcin:
-        group: pcs
+      users:
+        destination: UsersById
+        group: user-enricher
         content-type: application/json
-        destination: pcs
-        consumer:
-          header-mode: raw
-          use-native-decoding: true
+        consumer.header-mode: raw
+      pageviewsin:
+        destination: PageViewEvent
+        group: user-enrincher
+        content-type: application/json
+        consumer.header-mode: raw
+      enrichedpageviewsout:
+        destination: EnrichedPageViewEvent
+        produced.header-mode: raw
   kafka:
     bootstrap-servers: "kafka:9092"
     producer:
@@ -41,3 +31,5 @@ spring:
 
 server:
   port: 12003
+
+debug: true

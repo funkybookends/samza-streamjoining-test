@@ -1,4 +1,4 @@
-package com.salmon.userservice.data;
+package com.salmon.eventproducer.data;
 
 import java.util.Objects;
 
