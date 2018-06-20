@@ -4,7 +4,6 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.messaging.MessageChannel;
 
 import com.salmon.userservice.data.EnrichedPageViewEvent;
 import com.salmon.userservice.data.PageViewEvent;
@@ -18,7 +17,9 @@ public interface AnalyticsBinding
 
 	String USERS_IN = "users";
 	@Input(USERS_IN)
-	KTable<String, UserData> usersIn();
+	KStream<String, UserData> usersIn();
+
+	String USERS_MV = "users-mv";
 
 	String ENRICHED_PAGE_VIEWS_OUT = "enrichedpageviewsout";
 	@Output(ENRICHED_PAGE_VIEWS_OUT)
