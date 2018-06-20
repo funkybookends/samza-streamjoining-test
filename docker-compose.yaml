@@ -10,7 +10,7 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#      KAFKA_CREATE_TOPICS: "user-data-byuserid:1:1:compact"
+      KAFKA_CREATE_TOPICS: "UsersById:1:1:compact"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     image: wurstmeister/kafka

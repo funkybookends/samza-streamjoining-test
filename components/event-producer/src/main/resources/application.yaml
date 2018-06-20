@@ -1,8 +1,30 @@
 spring:
+  cloud.stream:
+    kafka.streams:
+      binder:
+        brokers: "kafka:9092"
+        configuration:
+          commit.interval.ms: 1000
+          default:
+            key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+            value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+    bindings:
+      users-out:
+        destination: UsersById
+        content-type: application/json
+        producer.header-mode: raw
+      pageviewsout:
+        destination: PageViewEvent
+        content-type: application/json
+        producer.header-mode: raw
   kafka:
-    bootstrap-servers: kafka:9092
-    client-id: event-producer
-    listener:
-      poll-timeout: PT1S
+    bootstrap-servers: "kafka:9092"
+    producer:
+      bootstrap-servers: "kafka:9092"
+    consumer:
+      bootstrap-servers: "kafka:9092"
+
 server:
   port: 11003
+
+debug: true

@@ -1,2 +1,4 @@
 rootProject.name = 'samza-kafka-test'
 
+include 'components:user-service'
+include 'components:event-producer'

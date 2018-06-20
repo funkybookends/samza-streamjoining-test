@@ -4,6 +4,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
 
 import com.salmon.userservice.data.EnrichedPageViewEvent;
 import com.salmon.userservice.data.PageViewEvent;

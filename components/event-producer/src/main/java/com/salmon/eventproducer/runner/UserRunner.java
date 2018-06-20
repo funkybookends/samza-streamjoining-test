@@ -11,14 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.salmon.eventproducer.bindings.AnalyticsBinding;
 import com.salmon.eventproducer.data.PageViewEvent;
 import com.salmon.eventproducer.data.UserData;
-
-import static com.salmon.eventproducer.controller.UserController.USER_TOPIC;
 
 @Component
 public class UserRunner implements ApplicationRunner
@@ -28,20 +28,15 @@ public class UserRunner implements ApplicationRunner
 	public static final List<String> NAMES = Arrays.asList("Caspar", "James", "Tomo", "Christian", "Richard", "Miriam", "DDS", "Nick", "Anna");
 	public static final List<String> PAGES = Arrays.asList("Blog", "About", "SiteMap", "views", "page", "news", "sport", "entertainment");
 	private static final List<String> USER_TYPES = Arrays.asList("Recruiter", "Candidate");
-	public static final String PAGE_VIEW_TOPIC = "PageViewEvent";
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-
-	private final KafkaTemplate<String, String> userDataKafkaTemplate;
-	private final KafkaTemplate<String, String> pageViewEventKafkaTemplate;
 	private static final Random RANDOM = new Random();
+	private final AnalyticsBinding analyticsBinding;
 
 	@Autowired
-	public UserRunner(final KafkaTemplate<String, String> userDataTemplate,
-	                  final KafkaTemplate<String, String> pageViewEventKafkaTemplate)
+	public UserRunner(final AnalyticsBinding analyticsBinding)
 	{
-		this.userDataKafkaTemplate = userDataTemplate;
-		this.pageViewEventKafkaTemplate = pageViewEventKafkaTemplate;
+		this.analyticsBinding = analyticsBinding;
+		LOG.info("Created user runner");
 	}
 
 	@Override
@@ -63,7 +58,12 @@ public class UserRunner implements ApplicationRunner
 
 		try
 		{
-			userDataKafkaTemplate.send(USER_TOPIC, name, OBJECT_MAPPER.writeValueAsString(userData));
+			Message<UserData> message = MessageBuilder.withPayload(userData)
+				.setHeader(KafkaHeaders.MESSAGE_KEY, userData.getUserId().getBytes())
+				.build();
+
+			analyticsBinding.usersOut().send(message);
+
 			LOG.info("Sent user Data: {}", userData);
 		}
 		catch (final Exception exception)
@@ -81,7 +81,12 @@ public class UserRunner implements ApplicationRunner
 
 		try
 		{
-			pageViewEventKafkaTemplate.send(PAGE_VIEW_TOPIC, OBJECT_MAPPER.writeValueAsString(pageViewEvent));
+			Message<PageViewEvent> message = MessageBuilder.withPayload(pageViewEvent)
+				.setHeader(KafkaHeaders.MESSAGE_KEY, pageViewEvent.getUserId().getBytes())
+				.build();
+
+			analyticsBinding.pageViewsOut().send(message);
+
 			LOG.info("Sent: {}", pageViewEvent);
 		}
 		catch (final Exception exception)
