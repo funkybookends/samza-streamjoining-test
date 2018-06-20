@@ -43,4 +43,13 @@ public class UserData
 	{
 		return Objects.hash(userId, userType);
 	}
+
+	@Override
+	public String toString()
+	{
+		return "UserData{" +
+			"userId='" + userId + '\'' +
+			", userType='" + userType + '\'' +
+			'}';
+	}
 }

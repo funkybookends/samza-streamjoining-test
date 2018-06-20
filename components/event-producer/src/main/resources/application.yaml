@@ -12,11 +12,15 @@ spring:
       users-out:
         destination: UsersById
         content-type: application/json
-        producer.header-mode: raw
+        producer:
+          header-mode: raw
+          use-native-encoding: false
       pageviewsout:
         destination: PageViewEvent
         content-type: application/json
-        producer.header-mode: raw
+        producer:
+          header-mode: raw
+          use-native-encoding: false
   kafka:
     bootstrap-servers: "kafka:9092"
     producer:

@@ -8,20 +8,34 @@ spring:
           default:
             key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
             value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      bindings:
+        users:
+          consumer.value-serde: com.salmon.userservice.serde.UserDataSerde
+        pageviewsin:
+          consumer.value-serde: com.salmon.userservice.serde.PageViewEventSerde
+        enrichedpageviewsout:
+          produced.value-serde: com.salmon.userservice.serde.EnrichedPageViewEventSerde
     bindings:
       users:
         destination: UsersById
         group: user-enricher
         content-type: application/json
-        consumer.header-mode: raw
+        consumer:
+          header-mode: raw
+          use-native-decoding: false
       pageviewsin:
         destination: PageViewEvent
         group: user-enrincher
         content-type: application/json
-        consumer.header-mode: raw
+        consumer:
+          header-mode: raw
+          use-native-decoding: false
       enrichedpageviewsout:
         destination: EnrichedPageViewEvent
-        produced.header-mode: raw
+        content-type: application/json
+        produced:
+          header-mode: raw
+          use-native-encoding: false
   kafka:
     bootstrap-servers: "kafka:9092"
     producer:
