@@ -1,7 +1,8 @@
-package com.salmon.userservice.serde;
+package com.salmon.schemas.serde;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.kafka.common.serialization.Deserializer;
@@ -10,11 +11,27 @@ import org.apache.kafka.common.serialization.Serializer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.salmon.userservice.data.EnrichedPageViewEvent;
 
-public class EnrichedPageViewEventSerde implements Serde<EnrichedPageViewEvent>
+import lombok.extern.java.Log;
+
+@Log
+public class JsonSerde<T> implements Serde<T>
 {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	private final Class<T> type;
+
+	private static final Map<Class<?>, JsonSerde<?>> SERDES = new HashMap<>();
+
+	private JsonSerde(final Class<T> type)
+	{
+		this.type = type;
+	}
+
+	public static <T> JsonSerde<T> forClass(final Class<T> clazz)
+	{
+		return (JsonSerde<T>) SERDES.computeIfAbsent(clazz, JsonSerde::new);
+	}
 
 	@Override
 	public void configure(final Map<String, ?> configs, final boolean isKey)
@@ -29,9 +46,9 @@ public class EnrichedPageViewEventSerde implements Serde<EnrichedPageViewEvent>
 	}
 
 	@Override
-	public Serializer<EnrichedPageViewEvent> serializer()
+	public Serializer<T> serializer()
 	{
-		return new Serializer<EnrichedPageViewEvent>()
+		return new Serializer<T>()
 		{
 			@Override
 			public void configure(final Map<String, ?> configs, final boolean isKey)
@@ -40,10 +57,11 @@ public class EnrichedPageViewEventSerde implements Serde<EnrichedPageViewEvent>
 			}
 
 			@Override
-			public byte[] serialize(final String topic, final EnrichedPageViewEvent data)
+			public byte[] serialize(final String topic, final T data)
 			{
 				if (data == null)
 				{
+					log.warning("Null data for seralization " + this.toString());
 					return null;
 				}
 
@@ -66,9 +84,9 @@ public class EnrichedPageViewEventSerde implements Serde<EnrichedPageViewEvent>
 	}
 
 	@Override
-	public Deserializer<EnrichedPageViewEvent> deserializer()
+	public Deserializer<T> deserializer()
 	{
-		return new Deserializer<EnrichedPageViewEvent>()
+		return new Deserializer<T>()
 		{
 			@Override
 			public void configure(final Map<String, ?> configs, final boolean isKey)
@@ -77,16 +95,17 @@ public class EnrichedPageViewEventSerde implements Serde<EnrichedPageViewEvent>
 			}
 
 			@Override
-			public EnrichedPageViewEvent deserialize(final String topic, final byte[] data)
+			public T deserialize(final String topic, final byte[] data)
 			{
 				if (data == null)
 				{
+					log.warning("Null data for deserialization" + this.toString());
 					return null;
 				}
 
 				try
 				{
-					return OBJECT_MAPPER.readValue(data, EnrichedPageViewEvent.class);
+					return OBJECT_MAPPER.readValue(data, type);
 				}
 				catch (IOException e)
 				{
@@ -100,5 +119,13 @@ public class EnrichedPageViewEventSerde implements Serde<EnrichedPageViewEvent>
 
 			}
 		};
+	}
+
+	@Override
+	public String toString()
+	{
+		return "JsonSerde{" +
+			"type=" + type +
+			'}';
 	}
 }

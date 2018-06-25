@@ -30,6 +30,7 @@ ext {
 }
 
 dependencies {
+	compile project(':common:schemas')
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.2.RELEASE'
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.apache.kafka:kafka-streams:1.0.1')

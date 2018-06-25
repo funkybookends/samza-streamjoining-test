@@ -30,6 +30,7 @@ ext {
 }
 
 dependencies {
+    compile project(':common:schemas')
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.2.RELEASE'
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile group: 'org.springframework.kafka', name: 'spring-kafka', version: '2.1.6.RELEASE'
@@ -37,6 +38,7 @@ dependencies {
     compile group: 'org.springframework.cloud', name: 'spring-cloud-stream-binder-kafka', version: '2.0.0.RELEASE'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-stream-binder-kafka-streams', version: '2.0.0.RELEASE'
     compile('org.apache.kafka:kafka-streams:1.0.1')
+    compile group: 'com.thedeanda', name: 'lorem', version: '2.1'
 
     compile('org.springframework.cloud:spring-cloud-starter')
     testCompile('org.springframework.boot:spring-boot-starter-test')

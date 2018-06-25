@@ -6,7 +6,7 @@ spring:
         configuration:
           commit.interval.ms: 1000
           default:
-            key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+            key.serde: com.salmon.schemas.serde.UUIDSerde
             value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
     bindings:
       users-out:
@@ -14,13 +14,13 @@ spring:
         content-type: application/json
         producer:
           header-mode: raw
-          use-native-encoding: false
-      pageviewsout:
-        destination: PageViewEvent
+          use-native-encoding: true
+      tweets-out:
+        destination: Tweets
         content-type: application/json
         producer:
           header-mode: raw
-          use-native-encoding: false
+          use-native-encoding: true
   kafka:
     bootstrap-servers: "kafka:9092"
     producer:

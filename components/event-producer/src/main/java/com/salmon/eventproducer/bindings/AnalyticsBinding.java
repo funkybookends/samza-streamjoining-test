@@ -5,9 +5,9 @@ import org.springframework.messaging.MessageChannel;
 
 public interface AnalyticsBinding
 {
-	String PAGE_VIEWS_OUT = "pageviewsout";
+	String TWEETS_OUT = "tweets-out";
 
-	@Output(PAGE_VIEWS_OUT)
+	@Output(TWEETS_OUT)
 	MessageChannel pageViewsOut();
 
 	String USERS_OUT = "users-out";

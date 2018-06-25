@@ -6,36 +6,29 @@ spring:
         configuration:
           commit.interval.ms: 1000
           default:
-            key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+            key.serde: com.salmon.schemas.serde.UUIDSerde
             value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-      bindings:
-        users:
-          consumer.value-serde: com.salmon.userservice.serde.UserDataSerde
-        pageviewsin:
-          consumer.value-serde: com.salmon.userservice.serde.PageViewEventSerde
-        enrichedpageviewsout:
-          produced.value-serde: com.salmon.userservice.serde.EnrichedPageViewEventSerde
     bindings:
-      users:
+      users-in:
         destination: UsersById
         group: user-enricher
         content-type: application/json
         consumer:
           header-mode: raw
-          use-native-decoding: false
-      pageviewsin:
-        destination: PageViewEvent
+          use-native-decoding: true
+      tweets-in:
+        destination: Tweets
         group: user-enrincher
         content-type: application/json
         consumer:
           header-mode: raw
-          use-native-decoding: false
-      enrichedpageviewsout:
-        destination: EnrichedPageViewEvent
+          use-native-decoding: true
+      enriched-tweets-out:
+        destination: EnrichedTweet
         content-type: application/json
         produced:
           header-mode: raw
-          use-native-encoding: false
+          use-native-encoding: true
   kafka:
     bootstrap-servers: "kafka:9092"
     producer:

@@ -1,27 +1,25 @@
 package com.salmon.userservice.bindings;
 
+import java.util.UUID;
+
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.Output;
 
-import com.salmon.userservice.data.EnrichedPageViewEvent;
-import com.salmon.userservice.data.PageViewEvent;
-import com.salmon.userservice.data.UserData;
+import com.salmon.schemas.data.EnrichedTweet;
+import com.salmon.schemas.data.Tweet;
+import com.salmon.schemas.data.UserData;
 
 public interface AnalyticsBinding
 {
-	String PAGE_VIEWS_IN = "pageviewsin";
-	@Input(PAGE_VIEWS_IN)
-	KStream<String, PageViewEvent> pageViewsIn();
+	String TWEETS_IN = "tweets-in";
+	@Input(TWEETS_IN) KStream<UUID, Tweet> tweetsIn();
 
-	String USERS_IN = "users";
-	@Input(USERS_IN)
-	KStream<String, UserData> usersIn();
+	String USERS_IN = "users-in";
+	@Input(USERS_IN) KStream<UUID, UserData> usersIn();
 
 	String USERS_MV = "users-mv";
 
-	String ENRICHED_PAGE_VIEWS_OUT = "enrichedpageviewsout";
-	@Output(ENRICHED_PAGE_VIEWS_OUT)
-	KStream<String, EnrichedPageViewEvent> enrichedPageViewsOut();
+	String ENRICHED_TWEETS_OUT = "enriched-tweets-out";
+	@Output(ENRICHED_TWEETS_OUT) KStream<UUID, EnrichedTweet> enrichedTweetsOut();
 }

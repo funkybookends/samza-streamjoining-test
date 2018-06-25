@@ -1,8 +1,10 @@
 package com.salmon.userservice.processors;
 
-import org.apache.kafka.common.serialization.Serdes;
+import java.util.UUID;
+
 import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Serialized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,42 +13,37 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
+import com.salmon.schemas.data.EnrichedTweet;
+import com.salmon.schemas.data.Tweet;
+import com.salmon.schemas.data.UserData;
+import com.salmon.schemas.serde.JsonSerde;
+import com.salmon.schemas.serde.UUIDSerde;
 import com.salmon.userservice.bindings.AnalyticsBinding;
-import com.salmon.userservice.data.EnrichedPageViewEvent;
-import com.salmon.userservice.data.PageViewEvent;
-import com.salmon.userservice.data.UserData;
-import com.salmon.userservice.serde.PageViewEventSerde;
-import com.salmon.userservice.serde.UserDataSerde;
 
 @Component
 public class PageViewsEnricher
 {
 	private static final Logger LOG = LoggerFactory.getLogger(PageViewsEnricher.class);
+	private static final UUIDSerde UUID_SERDE = new UUIDSerde();
 
-	private Joined<String, PageViewEvent, UserData> joined = Joined.with(Serdes.String(), new PageViewEventSerde(), new UserDataSerde());
+	private Joined<UUID, Tweet, UserData> joined = Joined.with(UUID_SERDE,
+		JsonSerde.forClass(Tweet.class),
+		JsonSerde.forClass(UserData.class));
 
 	@StreamListener
-	@SendTo(AnalyticsBinding.ENRICHED_PAGE_VIEWS_OUT)
-	public KStream<String, EnrichedPageViewEvent> process(@Input(AnalyticsBinding.PAGE_VIEWS_IN) KStream<String, PageViewEvent> pageViewEvents,
-	                                                      @Input(AnalyticsBinding.USERS_IN) KStream<String, UserData> usersEvents)
+	@SendTo(AnalyticsBinding.ENRICHED_TWEETS_OUT)
+	public KStream<UUID, EnrichedTweet> process(@Input(AnalyticsBinding.TWEETS_IN) KStream<UUID, Tweet> tweetsStream,
+	                                            @Input(AnalyticsBinding.USERS_IN) KStream<UUID, UserData> userRegistrations)
 	{
 		LOG.info("Creating join");
-		return pageViewEvents.peek((userId, pageViewEvent) -> LOG.info("Processing {}:{}", userId, pageViewEvent))
-			.join(
-				usersEvents.groupBy((key, value) -> key, Serialized.with(Serdes.String(), new UserDataSerde()))
-					.reduce(this::reduce, AnalyticsBinding.USERS_MV)
-				, this::join, this.joined);
-	}
+		final KTable<UUID, UserData> usersTable = userRegistrations
+			.peek((uuid, userData) -> LOG.info("Peeking at User {}, {}", uuid, userData))
+			.groupByKey(Serialized.with(UUID_SERDE, JsonSerde.forClass(UserData.class)))
+			.reduce(UserData::merge, AnalyticsBinding.USERS_MV);
 
-	private UserData reduce(final UserData first, final UserData second)
-	{
-		return second;
-	}
-
-	private EnrichedPageViewEvent join(PageViewEvent pageView, UserData user)
-	{
-		LOG.info("Joining pageView: {} with user: {}", pageView, user);
-		return new EnrichedPageViewEvent(pageView.getUserId(), user.getUserType(), pageView.getPage(), pageView.getDuration());
+		return tweetsStream
+			.peek((uuid, tweet) -> LOG.info("Peeking at Tweet: {}, {}", uuid, tweet))
+			.join(usersTable, EnrichedTweet::enrich, this.joined);
 	}
 
 }

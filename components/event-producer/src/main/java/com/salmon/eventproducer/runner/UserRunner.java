@@ -1,8 +1,13 @@
 package com.salmon.eventproducer.runner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -17,17 +22,20 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import com.salmon.eventproducer.bindings.AnalyticsBinding;
-import com.salmon.eventproducer.data.PageViewEvent;
-import com.salmon.eventproducer.data.UserData;
+import com.salmon.schemas.data.Tweet;
+import com.salmon.schemas.data.UserData;
+import com.thedeanda.lorem.LoremIpsum;
 
 @Component
 public class UserRunner implements ApplicationRunner
 {
 	private static final Logger LOG = LoggerFactory.getLogger(UserRunner.class);
 
-	public static final List<String> NAMES = Arrays.asList("Caspar", "James", "Tomo", "Christian", "Richard", "Miriam", "DDS", "Nick", "Anna");
-	public static final List<String> PAGES = Arrays.asList("Blog", "About", "SiteMap", "views", "page", "news", "sport", "entertainment");
+	public static final List<String> FIRST_NAME = Arrays.asList("Caspar", "James", "Tomo", "Christian", "Richard", "Miriam", "DDS", "Nick", "Anna");
+	public static final List<String> SURNAME = Arrays.asList("Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo");
 	private static final List<String> USER_TYPES = Arrays.asList("Recruiter", "Candidate");
+
+	private static final List<UserData> USERS = Collections.synchronizedList(new ArrayList<>());
 
 	private static final Random RANDOM = new Random();
 	private final AnalyticsBinding analyticsBinding;
@@ -42,29 +50,48 @@ public class UserRunner implements ApplicationRunner
 	@Override
 	public void run(final ApplicationArguments args) throws Exception
 	{
-		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::createUser, 1, 3, TimeUnit.SECONDS);
-		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::createView, 1, 1, TimeUnit.SECONDS);
+		this.registerUser();
+		this.registerUser();
+		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::registerUser, 1, 60, TimeUnit.SECONDS);
+		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::tweet, 1, 3, TimeUnit.SECONDS);
 	}
 
-	private void createUser()
+	private void registerUser()
 	{
-		final int userNameIndex = RANDOM.nextInt(NAMES.size());
-		final int typeIndex = userNameIndex % USER_TYPES.size();
+		final int firstNameIndex = RANDOM.nextInt(FIRST_NAME.size());
+		final int surnameNameIndex = RANDOM.nextInt(SURNAME.size());
+		final int typeIndex = firstNameIndex % USER_TYPES.size();
 
-		final String name = NAMES.get(userNameIndex);
-		final String userType = USER_TYPES.get(typeIndex);
+		final UserData userData = UserData.builder()
+			.userId(UUID.randomUUID())
+			.username((FIRST_NAME.get(firstNameIndex) + "_" + SURNAME.get(surnameNameIndex)).toLowerCase(Locale.ENGLISH))
+			.userType(USER_TYPES.get(typeIndex))
+			.usageTime(0)
+			.registrationDate(new Date())
+			.lastVisitedDate(new Date())
+			.lastTweetDate(null)
+			.build();
 
-		final UserData userData = new UserData(name, userType);
+		for (final UserData user : USERS)
+		{
+			if (user.getUsername().equals(userData.getUsername()))
+			{
+				LOG.warn("User exits: breaking");
+				return;
+			}
+		}
 
 		try
 		{
 			Message<UserData> message = MessageBuilder.withPayload(userData)
-				.setHeader(KafkaHeaders.MESSAGE_KEY, userData.getUserId().getBytes())
+				.setHeader(KafkaHeaders.MESSAGE_KEY, userData.getUserId().toString().getBytes())
 				.build();
 
 			analyticsBinding.usersOut().send(message);
 
-			LOG.info("Sent user Data: {}", userData);
+			USERS.add(userData);
+
+			LOG.info("New {}", userData);
 		}
 		catch (final Exception exception)
 		{
@@ -72,26 +99,30 @@ public class UserRunner implements ApplicationRunner
 		}
 	}
 
-	private void createView()
+	private void tweet()
 	{
-		final String page = PAGES.get(RANDOM.nextInt(PAGES.size()));
-		final String userId = NAMES.get(RANDOM.nextInt(NAMES.size()));
+		final UserData user = USERS.get(RANDOM.nextInt(USERS.size()));
 
-		final PageViewEvent pageViewEvent = new PageViewEvent(userId, page, Math.random() > 0.5 ? 10 : 1000);
+		final Tweet tweet = Tweet.builder()
+			.tweetId(UUID.randomUUID())
+			.userId(user.getUserId())
+			.date(new Date())
+			.text(LoremIpsum.getInstance().getWords(5, 10))
+			.build();
 
 		try
 		{
-			Message<PageViewEvent> message = MessageBuilder.withPayload(pageViewEvent)
-				.setHeader(KafkaHeaders.MESSAGE_KEY, pageViewEvent.getUserId().getBytes())
+			Message<Tweet> message = MessageBuilder.withPayload(tweet)
+				.setHeader(KafkaHeaders.MESSAGE_KEY, tweet.getTweetId().toString().getBytes())
 				.build();
 
 			analyticsBinding.pageViewsOut().send(message);
 
-			LOG.info("Sent: {}", pageViewEvent);
+			LOG.info("User {} tweeted {}", user, tweet);
 		}
 		catch (final Exception exception)
 		{
-			LOG.warn("Error sending: {}", pageViewEvent, exception);
+			LOG.warn("Error sending: {}", tweet, exception);
 		}
 	}
 }
