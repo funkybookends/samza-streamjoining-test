@@ -2,6 +2,7 @@ package com.salmon.schemas.serde;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,21 +10,35 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import com.salmon.schemas.data.EnrichedTweet;
+import com.salmon.schemas.data.Tweet;
+import com.salmon.schemas.data.UserData;
 
+import lombok.ToString;
 import lombok.extern.java.Log;
 
 @Log
+@ToString
 public class JsonSerde<T> implements Serde<T>
 {
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
+		.registerModule(new Jdk8Module())
+		.registerModule(new JavaTimeModule())
+		.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
 
 	private final Class<T> type;
 
 	private static final Map<Class<?>, JsonSerde<?>> SERDES = new HashMap<>();
 
-	private JsonSerde(final Class<T> type)
+	protected JsonSerde(final Class<T> type)
 	{
 		this.type = type;
 	}
@@ -61,12 +76,13 @@ public class JsonSerde<T> implements Serde<T>
 			{
 				if (data == null)
 				{
-					log.warning("Null data for seralization " + this.toString());
+					log.warning("Null data for seralization " + this.toString() + " for topic: " + topic);
 					return null;
 				}
 
 				try
 				{
+					log.fine("Serializing " + data.toString() + " for topic: " + topic);
 					return OBJECT_MAPPER.writeValueAsBytes(data);
 				}
 				catch (JsonProcessingException e)
@@ -99,13 +115,17 @@ public class JsonSerde<T> implements Serde<T>
 			{
 				if (data == null)
 				{
-					log.warning("Null data for deserialization" + this.toString());
+					log.warning("Null data for deserialization" + this.toString() + " for topic: " + topic);
 					return null;
 				}
 
 				try
 				{
-					return OBJECT_MAPPER.readValue(data, type);
+					final T value = OBJECT_MAPPER.readValue(data, type);
+
+					log.fine("Deserialized: " + value.toString() + " for topic: " + topic);
+
+					return value;
 				}
 				catch (IOException e)
 				{
@@ -121,11 +141,27 @@ public class JsonSerde<T> implements Serde<T>
 		};
 	}
 
-	@Override
-	public String toString()
+	public static class TweetSerde extends JsonSerde<Tweet>
 	{
-		return "JsonSerde{" +
-			"type=" + type +
-			'}';
+		public TweetSerde()
+		{
+			super(Tweet.class);
+		}
+	}
+
+	public static class UserDataSerde extends JsonSerde<UserData>
+	{
+		public UserDataSerde()
+		{
+			super(UserData.class);
+		}
+	}
+
+	public static class EnrichedTweetSerde extends JsonSerde<EnrichedTweet>
+	{
+		public EnrichedTweetSerde()
+		{
+			super(EnrichedTweet.class);
+		}
 	}
 }

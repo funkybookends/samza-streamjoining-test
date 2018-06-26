@@ -3,6 +3,7 @@ package com.salmon.userservice.bindings;
 import java.util.UUID;
 
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.Output;
 
@@ -16,9 +17,7 @@ public interface AnalyticsBinding
 	@Input(TWEETS_IN) KStream<UUID, Tweet> tweetsIn();
 
 	String USERS_IN = "users-in";
-	@Input(USERS_IN) KStream<UUID, UserData> usersIn();
-
-	String USERS_MV = "users-mv";
+	@Input(USERS_IN) KTable<UUID, UserData> usersIn();
 
 	String ENRICHED_TWEETS_OUT = "enriched-tweets-out";
 	@Output(ENRICHED_TWEETS_OUT) KStream<UUID, EnrichedTweet> enrichedTweetsOut();

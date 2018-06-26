@@ -7,6 +7,9 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
+import lombok.extern.java.Log;
+
+@Log
 public class UUIDSerde implements Serde<UUID>
 {
 	@Override
@@ -39,6 +42,7 @@ public class UUIDSerde implements Serde<UUID>
 				{
 					return null;
 				}
+				log.fine("Serializing UUID: " + data.toString() + " for topic: " + topic);
 				return data.toString().getBytes();
 			}
 
@@ -68,7 +72,9 @@ public class UUIDSerde implements Serde<UUID>
 				{
 					return null;
 				}
-				return UUID.nameUUIDFromBytes(data);
+				final String uuidString = new String(data);
+				log.fine("Deserializing UUID: " + uuidString + " for topic: " + topic);
+				return UUID.fromString(uuidString);
 			}
 
 			@Override

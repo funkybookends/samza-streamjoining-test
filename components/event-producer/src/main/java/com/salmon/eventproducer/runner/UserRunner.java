@@ -31,8 +31,8 @@ public class UserRunner implements ApplicationRunner
 {
 	private static final Logger LOG = LoggerFactory.getLogger(UserRunner.class);
 
-	public static final List<String> FIRST_NAME = Arrays.asList("Caspar", "James", "Tomo", "Christian", "Richard", "Miriam", "DDS", "Nick", "Anna");
-	public static final List<String> SURNAME = Arrays.asList("Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo");
+	private static final List<String> FIRST_NAME = Arrays.asList("Caspar", "James", "Tomo", "Christian", "Richard", "Miriam", "DDS", "Nick", "Anna");
+	private static final List<String> SURNAME = Arrays.asList("Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo");
 	private static final List<String> USER_TYPES = Arrays.asList("Recruiter", "Candidate");
 
 	private static final List<UserData> USERS = Collections.synchronizedList(new ArrayList<>());
@@ -48,7 +48,7 @@ public class UserRunner implements ApplicationRunner
 	}
 
 	@Override
-	public void run(final ApplicationArguments args) throws Exception
+	public void run(final ApplicationArguments args)
 	{
 		this.registerUser();
 		this.registerUser();
