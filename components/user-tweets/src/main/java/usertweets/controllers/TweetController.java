@@ -1,4 +1,4 @@
-package com.salmon.tweetenricher.controllers;
+package usertweets.controllers;
 
 import java.util.UUID;
 
@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.salmon.schemas.data.UserTweets;
-import com.salmon.tweetenricher.bindings.TweetEnricherBinding;
+
+import usertweets.bindings.UserTweetsBinding;
 
 @RestController
 public class TweetController
@@ -31,7 +32,7 @@ public class TweetController
 	@GetMapping(path = "/tweets/user-by-id/{id}")
 	public UserTweets getTweetsByUser(@PathVariable("id") final String uuid)
 	{
-		final ReadOnlyKeyValueStore<UUID, UserTweets> store = queryableStoreRegistry.getQueryableStoreType(TweetEnricherBinding.TWEETS_STORE, QueryableStoreTypes.keyValueStore());
+		final ReadOnlyKeyValueStore<UUID, UserTweets> store = queryableStoreRegistry.getQueryableStoreType(UserTweetsBinding.TWEETS_STORE, QueryableStoreTypes.keyValueStore());
 
 		store.all().forEachRemaining(entry -> LOG.info("Entry: {}, {}", entry.key, entry.value));
 

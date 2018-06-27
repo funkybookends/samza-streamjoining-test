@@ -1,17 +1,18 @@
-package com.salmon.eventproducer;
+package usertweets;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 
-import com.salmon.eventproducer.bindings.EventProducerBinding;
+import usertweets.bindings.UserTweetsBinding;
 
 @SpringBootApplication
-@EnableBinding(EventProducerBinding.class)
-public class Application
+@EnableBinding(UserTweetsBinding.class)
+public class TweetEnricherApplication
 {
 	public static void main(String[] args)
 	{
-		SpringApplication.run(Application.class, args);
+		SpringApplication.run(TweetEnricherApplication.class, args);
 	}
 }
+

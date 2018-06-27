@@ -34,3 +34,13 @@ services:
     depends_on:
       - kafka
       - zookeeper
+  user-tweets:
+    build: components/user-tweets
+    links:
+      - kafka
+      - zookeeper
+    ports:
+      - "13003:13003"
+    depends_on:
+      - kafka
+      - zookeeper

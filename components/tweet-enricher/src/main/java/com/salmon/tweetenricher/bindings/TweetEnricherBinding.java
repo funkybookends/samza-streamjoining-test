@@ -11,7 +11,7 @@ import com.salmon.schemas.data.EnrichedTweet;
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserData;
 
-public interface AnalyticsBinding
+public interface TweetEnricherBinding
 {
 	String TWEETS_IN = "tweets-in";
 	String TWEETS_STORE = "tweets-mv";

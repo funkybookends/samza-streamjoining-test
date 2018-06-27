@@ -18,7 +18,7 @@ import com.salmon.schemas.data.UserData;
 import com.salmon.schemas.data.UserTweets;
 import com.salmon.schemas.serde.JsonSerde;
 import com.salmon.schemas.serde.UUIDSerde;
-import com.salmon.tweetenricher.bindings.AnalyticsBinding;
+import com.salmon.tweetenricher.bindings.TweetEnricherBinding;
 
 @Component
 public class TweetEnricher
@@ -31,29 +31,15 @@ public class TweetEnricher
 		JsonSerde.forClass(Tweet.class),
 		JsonSerde.forClass(UserData.class));
 
-	private Joined<UUID, Tweet, UserData> userJoinger = Joined.with(UUID_SERDE,
-		JsonSerde.forClass(Tweet.class),
-		JsonSerde.forClass(UserData.class));
-
 	@StreamListener
-	@SendTo(AnalyticsBinding.ENRICHED_TWEETS_OUT)
-	public KStream<UUID, EnrichedTweet> enrichTweets(@Input(AnalyticsBinding.TWEETS_IN) KStream<UUID, Tweet> tweetsStream,
-	                                                 @Input(AnalyticsBinding.USERS_IN) KTable<UUID, UserData> usersTable)
+	@SendTo(TweetEnricherBinding.ENRICHED_TWEETS_OUT)
+	public KStream<UUID, EnrichedTweet> enrichTweets(@Input(TweetEnricherBinding.TWEETS_IN) KStream<UUID, Tweet> tweetsStream,
+	                                                 @Input(TweetEnricherBinding.USERS_IN) KTable<UUID, UserData> usersTable)
 	{
 		LOG.info("UsersTable: {}", usersTable.queryableStoreName());
 
 		return tweetsStream.selectKey((tweetId, tweet) -> tweet.getUserId())
 			.join(usersTable, EnrichedTweet::enrich, this.joined)
 			.selectKey((userId, enrichedTweet) -> enrichedTweet.getTweetId());
-	}
-
-	@StreamListener
-	public void createUserTweets(@Input(AnalyticsBinding.TWEETS_IN) KStream<UUID, Tweet> tweetsStream,
-	                             @Input(AnalyticsBinding.USERS_IN) KTable<UUID, UserData> usersTable)
-	{
-		tweetsStream.selectKey((tweetId, tweet) -> tweet.getUserId())
-			.join(usersTable, UserTweets::enrich, userJoinger)
-			.groupByKey()
-			.reduce(UserTweets::reduce, AnalyticsBinding.TWEETS_STORE);
 	}
 }

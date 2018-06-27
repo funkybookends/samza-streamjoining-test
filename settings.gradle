@@ -4,4 +4,4 @@ include ':common:schemas'
 
 include ':components:tweet-enricher'
 include ':components:event-producer'
-
+include ':components:user-tweets'

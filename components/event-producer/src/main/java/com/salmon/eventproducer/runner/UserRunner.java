@@ -21,7 +21,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-import com.salmon.eventproducer.bindings.AnalyticsBinding;
+import com.salmon.eventproducer.bindings.EventProducerBinding;
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserData;
 import com.thedeanda.lorem.LoremIpsum;
@@ -38,12 +38,12 @@ public class UserRunner implements ApplicationRunner
 	private static final List<UserData> USERS = Collections.synchronizedList(new ArrayList<>());
 
 	private static final Random RANDOM = new Random();
-	private final AnalyticsBinding analyticsBinding;
+	private final EventProducerBinding eventProducerBinding;
 
 	@Autowired
-	public UserRunner(final AnalyticsBinding analyticsBinding)
+	public UserRunner(final EventProducerBinding eventProducerBinding)
 	{
-		this.analyticsBinding = analyticsBinding;
+		this.eventProducerBinding = eventProducerBinding;
 		LOG.info("Created user runner");
 	}
 
@@ -83,7 +83,7 @@ public class UserRunner implements ApplicationRunner
 				.setHeader(KafkaHeaders.MESSAGE_KEY, userData.getUserId().toString().getBytes())
 				.build();
 
-			analyticsBinding.usersOut().send(message);
+			eventProducerBinding.usersOut().send(message);
 
 			USERS.add(userData);
 
@@ -112,7 +112,7 @@ public class UserRunner implements ApplicationRunner
 				.setHeader(KafkaHeaders.MESSAGE_KEY, tweet.getTweetId().toString().getBytes())
 				.build();
 
-			analyticsBinding.pageViewsOut().send(message);
+			eventProducerBinding.pageViewsOut().send(message);
 
 			LOG.info("User {} tweeted {}", user, tweet);
 		}

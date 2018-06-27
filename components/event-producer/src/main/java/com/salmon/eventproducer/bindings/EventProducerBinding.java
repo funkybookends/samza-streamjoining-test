@@ -3,7 +3,7 @@ package com.salmon.eventproducer.bindings;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.messaging.MessageChannel;
 
-public interface AnalyticsBinding
+public interface EventProducerBinding
 {
 	String TWEETS_OUT = "tweets-out";
 
