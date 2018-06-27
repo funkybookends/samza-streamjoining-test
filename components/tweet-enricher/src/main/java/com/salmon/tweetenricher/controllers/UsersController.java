@@ -34,7 +34,7 @@ public class UsersController
 		LOG.info("Store Name: {}", storeName);
 	}
 
-	@GetMapping(path = "/user/by-uuid/{id}")
+	@GetMapping(path = "/user/user-by-id/{id}")
 	public UserData getUserData(final @PathVariable("id") String userId)
 	{
 		final ReadOnlyKeyValueStore<UUID, UserData> store = queryableStoreRegistry.getQueryableStoreType(storeName,QueryableStoreTypes.keyValueStore());

@@ -1,4 +1,4 @@
-package usertweets.controllers;
+package com.salmon.userfollows.controllers;
 
 import java.util.UUID;
 
@@ -12,27 +12,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.salmon.schemas.data.UserTweets;
+import com.salmon.schemas.data.UserFollows;
 
-import usertweets.bindings.UserTweetsBinding;
+import com.salmon.userfollows.bindings.UserFollowsBinding;
 
 @RestController
-public class TweetController
+public class FollowsController
 {
-	private static final Logger LOG = LoggerFactory.getLogger(TweetController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FollowsController.class);
 
 	private final QueryableStoreRegistry queryableStoreRegistry;
 
 	@Autowired
-	public TweetController(final QueryableStoreRegistry queryableStoreRegistry)
+	public FollowsController(final QueryableStoreRegistry queryableStoreRegistry)
 	{
 		this.queryableStoreRegistry = queryableStoreRegistry;
 	}
 
-	@GetMapping(path = "/tweets/user-by-id/{id}")
-	public UserTweets getTweetsByUser(@PathVariable("id") final String uuid)
+	@GetMapping(path = "/follows/user-by-id/{id}")
+	public UserFollows getTweetsByUser(@PathVariable("id") final String uuid)
 	{
-		final ReadOnlyKeyValueStore<UUID, UserTweets> store = queryableStoreRegistry.getQueryableStoreType(UserTweetsBinding.TWEETS_STORE, QueryableStoreTypes.keyValueStore());
+		final ReadOnlyKeyValueStore<UUID, UserFollows> store = queryableStoreRegistry.getQueryableStoreType(UserFollowsBinding.USER_FOLLOWS, QueryableStoreTypes.keyValueStore());
 
 		store.all().forEachRemaining(entry -> LOG.info("Entry: {}, {}", entry.key, entry.value));
 

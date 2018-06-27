@@ -8,33 +8,40 @@ spring:
           commit.interval.ms: 1000
           default:
             key.serde: com.salmon.schemas.serde.UUIDSerde
+      bindings:
+        users-in.consumer.value-serde: com.salmon.schemas.serde.JsonSerde$UserDataSerde
+        follows-in.consumer.value-serde: com.salmon.schemas.serde.JsonSerde$FollowRequestSerde
+        follows-out.producer.value-serde: com.salmon.schemas.serde.JsonSerde$UserFollowsSerde
     bindings:
-      users-out:
+      users-in:
         destination: Users
+        group: user-follows
         content-type: application/json
-        producer:
+        consumer:
           header-mode: raw
-          use-native-encoding: false
-      tweets-out:
-        destination: Tweets
-        content-type: application/json
-        producer:
-          header-mode: raw
-          use-native-encoding: false
-      follows-out:
+          use-native-decoding: true
+      follows-in:
         destination: FollowRequests
+        group: user-follows
+        content-type: application/json
+        consumer:
+          header-mode: raw
+          use-native-decoding: true
+      follows-out:
+        destination: UserFollows
         content-type: application/json
         producer:
           header-mode: raw
-          use-native-encoding: false
+          use-native-encoding: true
   kafka:
     bootstrap-servers: "kafka:9092"
     producer:
       bootstrap-servers: "kafka:9092"
     consumer:
       bootstrap-servers: "kafka:9092"
+  jackson.serialization.INDENT_OUTPUT: true
 
 server:
-  port: 11003
+  port: 14003
 
 debug: true

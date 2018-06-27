@@ -1,4 +1,4 @@
-package usertweets.processors;
+package com.salmon.usertweets.processors;
 
 import java.util.UUID;
 
@@ -14,11 +14,12 @@ import org.springframework.stereotype.Component;
 
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserData;
+import com.salmon.schemas.data.UserFollows;
 import com.salmon.schemas.data.UserTweets;
 import com.salmon.schemas.serde.JsonSerde;
 import com.salmon.schemas.serde.UUIDSerde;
 
-import usertweets.bindings.UserTweetsBinding;
+import com.salmon.usertweets.bindings.UserTweetsBinding;
 
 @Component
 public class UserTweetsJoiner
@@ -33,7 +34,9 @@ public class UserTweetsJoiner
 
 	@StreamListener
 	public void createUserTweets(@Input(UserTweetsBinding.TWEETS_IN) KStream<UUID, Tweet> tweetsStream,
-	                             @Input(UserTweetsBinding.USERS_IN) KTable<UUID, UserData> usersTable)
+	                             @Input(UserTweetsBinding.USERS_IN) KTable<UUID, UserData> usersTable,
+	                             @Input(UserTweetsBinding.USER_FOLLOWS_IN)KTable<UUID, UserFollows> userFollowsTable
+	)
 	{
 		tweetsStream
 			.peek((tweetId, tweet) -> LOG.info("Received tweet: {}", tweet))

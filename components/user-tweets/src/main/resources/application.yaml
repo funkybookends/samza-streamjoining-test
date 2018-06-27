@@ -13,10 +13,21 @@ spring:
           consumer:
             materialized-as: users-mv
             value-serde: com.salmon.schemas.serde.JsonSerde$UserDataSerde
+        follows-in:
+          consumer:
+            materialized-as: follows-mv
+            value-serde: com.salmon.schemas.serde.JsonSerde$UserFollowsSerde
         tweets-in.consumer.value-serde: com.salmon.schemas.serde.JsonSerde$TweetSerde
     bindings:
       users-in:
         destination: Users
+        group: user-tweets
+        content-type: application/json
+        consumer:
+          header-mode: raw
+          use-native-decoding: true
+      follows-in:
+        destination: UserFollows
         group: user-tweets
         content-type: application/json
         consumer:

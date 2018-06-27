@@ -18,8 +18,10 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.salmon.schemas.data.EnrichedTweet;
+import com.salmon.schemas.data.FollowRequest;
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserData;
+import com.salmon.schemas.data.UserFollows;
 import com.salmon.schemas.data.UserTweets;
 
 import lombok.ToString;
@@ -171,6 +173,22 @@ public class JsonSerde<T> implements Serde<T>
 		public UserTweetsSerde()
 		{
 			super(UserTweets.class);
+		}
+	}
+
+	public static class FollowRequestSerde extends JsonSerde<FollowRequest>
+	{
+		public FollowRequestSerde()
+		{
+			super(FollowRequest.class);
+		}
+	}
+
+	public static class UserFollowsSerde extends JsonSerde<UserFollows>
+	{
+		public UserFollowsSerde()
+		{
+			super(UserFollows.class);
 		}
 	}
 }

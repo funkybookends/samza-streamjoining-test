@@ -22,6 +22,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import com.salmon.eventproducer.bindings.EventProducerBinding;
+import com.salmon.schemas.data.FollowRequest;
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserData;
 import com.thedeanda.lorem.LoremIpsum;
@@ -36,6 +37,7 @@ public class UserRunner implements ApplicationRunner
 	private static final List<String> USER_TYPES = Arrays.asList("Recruiter", "Candidate");
 
 	private static final List<UserData> USERS = Collections.synchronizedList(new ArrayList<>());
+	private static final List<FollowRequest> FOLLOW_REQUESTS = Collections.synchronizedList(new ArrayList<>());
 
 	private static final Random RANDOM = new Random();
 	private final EventProducerBinding eventProducerBinding;
@@ -54,6 +56,7 @@ public class UserRunner implements ApplicationRunner
 		this.registerUser();
 		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::registerUser, 1, 60, TimeUnit.SECONDS);
 		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::tweet, 1, 3, TimeUnit.SECONDS);
+		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::createFollow, 10, 5, TimeUnit.SECONDS);
 	}
 
 	private void registerUser()
@@ -119,6 +122,47 @@ public class UserRunner implements ApplicationRunner
 		catch (final Exception exception)
 		{
 			LOG.warn("Error sending: {}", tweet, exception);
+		}
+	}
+
+	private void createFollow()
+	{
+		final UserData first = USERS.get(RANDOM.nextInt(USERS.size()));
+		final UserData second = USERS.get(RANDOM.nextInt(USERS.size()));
+
+		if (first == second)
+		{
+			return;
+		}
+
+		for (final FollowRequest followRequest : FOLLOW_REQUESTS)
+		{
+			if (followRequest.same(first, second))
+			{
+				return;
+			}
+		}
+
+		final FollowRequest followRequest = FollowRequest.builder()
+			.followRequestId(UUID.randomUUID())
+			.follower(first.getUserId())
+			.follows(second.getUserId())
+			.dateRequested(new Date())
+			.build();
+
+		try
+		{
+			Message<FollowRequest> message = MessageBuilder.withPayload(followRequest)
+				.setHeader(KafkaHeaders.MESSAGE_KEY, followRequest.getFollowRequestId().toString().getBytes())
+				.build();
+
+			eventProducerBinding.followRequestsOut().send(message);
+
+			LOG.info("User {} is following {}", first, second);
+		}
+		catch (final Exception exception)
+		{
+			LOG.warn("Error sending: {}", followRequest, exception);
 		}
 	}
 }

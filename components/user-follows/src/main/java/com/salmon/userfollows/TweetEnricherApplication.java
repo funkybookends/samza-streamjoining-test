@@ -1,13 +1,13 @@
-package usertweets;
+package com.salmon.userfollows;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 
-import usertweets.bindings.UserTweetsBinding;
+import com.salmon.userfollows.bindings.UserFollowsBinding;
 
 @SpringBootApplication
-@EnableBinding(UserTweetsBinding.class)
+@EnableBinding(UserFollowsBinding.class)
 public class TweetEnricherApplication
 {
 	public static void main(String[] args)
