@@ -24,8 +24,8 @@ services:
       - "11003:11003"
     depends_on:
       - kafka
-  user-service:
-    build: components/user-service
+  tweet-enricher:
+    build: components/tweet-enricher
     links:
       - kafka
       - zookeeper

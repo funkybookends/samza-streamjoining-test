@@ -20,6 +20,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.salmon.schemas.data.EnrichedTweet;
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserData;
+import com.salmon.schemas.data.UserTweets;
 
 import lombok.ToString;
 import lombok.extern.java.Log;
@@ -162,6 +163,14 @@ public class JsonSerde<T> implements Serde<T>
 		public EnrichedTweetSerde()
 		{
 			super(EnrichedTweet.class);
+		}
+	}
+
+	public static class UserTweetsSerde extends JsonSerde<UserTweets>
+	{
+		public UserTweetsSerde()
+		{
+			super(UserTweets.class);
 		}
 	}
 }

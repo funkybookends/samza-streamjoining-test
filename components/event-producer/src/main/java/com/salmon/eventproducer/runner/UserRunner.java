@@ -66,10 +66,6 @@ public class UserRunner implements ApplicationRunner
 			.userId(UUID.randomUUID())
 			.username((FIRST_NAME.get(firstNameIndex) + "_" + SURNAME.get(surnameNameIndex)).toLowerCase(Locale.ENGLISH))
 			.userType(USER_TYPES.get(typeIndex))
-			.usageTime(0)
-			.registrationDate(new Date())
-			.lastVisitedDate(new Date())
-			.lastTweetDate(null)
 			.build();
 
 		for (final UserData user : USERS)

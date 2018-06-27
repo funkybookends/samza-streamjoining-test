@@ -1,4 +1,4 @@
-package com.salmon.userservice.controllers;
+package com.salmon.tweetenricher.controllers;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.salmon.userservice.bindings;
+package com.salmon.tweetenricher.bindings;
 
 import java.util.UUID;
 
@@ -14,6 +14,8 @@ import com.salmon.schemas.data.UserData;
 public interface AnalyticsBinding
 {
 	String TWEETS_IN = "tweets-in";
+	String TWEETS_STORE = "tweets-mv";
+
 	@Input(TWEETS_IN) KStream<UUID, Tweet> tweetsIn();
 
 	String USERS_IN = "users-in";

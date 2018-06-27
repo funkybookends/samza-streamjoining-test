@@ -2,6 +2,6 @@ rootProject.name = 'samza-kafka-test'
 
 include ':common:schemas'
 
-include ':components:user-service'
+include ':components:tweet-enricher'
 include ':components:event-producer'
 
