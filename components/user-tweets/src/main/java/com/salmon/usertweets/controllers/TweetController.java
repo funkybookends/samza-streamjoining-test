@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserFollows;
 import com.salmon.schemas.data.UserTweets;
-
 import com.salmon.usertweets.bindings.UserTweetsBinding;
 
 @RestController

@@ -39,12 +39,11 @@ public class UserTweetsJoiner
 	)
 	{
 		tweetsStream
-			.peek((tweetId, tweet) -> LOG.info("Received tweet: {}", tweet))
 			.selectKey((tweetId, tweet) -> tweet.getUserId())
 			.join(usersTable, UserTweets::enrich, userJoinger)
 			.groupByKey(Serialized.with(UUID_SERDE, JsonSerde.forClass(UserTweets.class)))
 			.reduce(UserTweets::reduce, UserTweetsBinding.TWEETS_STORE)
 			.toStream()
-			.peek((userId, userTweets) -> LOG.info("Updated: {}", userTweets));
+			.peek((userId, userTweets) -> LOG.info("Recorded Tweet for : {}", userId));
 	}
 }

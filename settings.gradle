@@ -5,6 +5,6 @@ include ':common:schemas'
 include ':components:tweet-enricher'
 include ':components:event-producer'
 include ':components:user-tweets'
-include 'components:user-follows'
-findProject(':components:user-follows')?.name = 'user-follows'
+include ':components:user-followers'
+include ':components:user-follows'
 

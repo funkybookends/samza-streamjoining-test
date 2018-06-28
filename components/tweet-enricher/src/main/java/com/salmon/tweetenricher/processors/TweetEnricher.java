@@ -36,10 +36,9 @@ public class TweetEnricher
 	public KStream<UUID, EnrichedTweet> enrichTweets(@Input(TweetEnricherBinding.TWEETS_IN) KStream<UUID, Tweet> tweetsStream,
 	                                                 @Input(TweetEnricherBinding.USERS_IN) KTable<UUID, UserData> usersTable)
 	{
-		LOG.info("UsersTable: {}", usersTable.queryableStoreName());
-
 		return tweetsStream.selectKey((tweetId, tweet) -> tweet.getUserId())
 			.join(usersTable, EnrichedTweet::enrich, this.joined)
-			.selectKey((userId, enrichedTweet) -> enrichedTweet.getTweetId());
+			.selectKey((userId, enrichedTweet) -> enrichedTweet.getTweetId())
+			.peek((tweetId, tweet) -> LOG.info("Enriched Tweet: {}", tweetId));
 	}
 }

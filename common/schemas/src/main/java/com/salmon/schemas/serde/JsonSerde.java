@@ -21,6 +21,7 @@ import com.salmon.schemas.data.EnrichedTweet;
 import com.salmon.schemas.data.FollowRequest;
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserData;
+import com.salmon.schemas.data.UserFollowers;
 import com.salmon.schemas.data.UserFollows;
 import com.salmon.schemas.data.UserTweets;
 
@@ -189,6 +190,14 @@ public class JsonSerde<T> implements Serde<T>
 		public UserFollowsSerde()
 		{
 			super(UserFollows.class);
+		}
+	}
+
+	public static class UserFollowersSerde extends JsonSerde<UserFollowers>
+	{
+		public UserFollowersSerde()
+		{
+			super(UserFollowers.class);
 		}
 	}
 }

@@ -23,8 +23,6 @@ public class EnrichedTweet
 
 	public static EnrichedTweet enrich(final Tweet tweet, final UserData user)
 	{
-		log.info("Enriching " + tweet.toString() + " with " + user.toString());
-
 		return EnrichedTweet.builder()
 			.tweetId(tweet.getTweetId())
 			.userId(user.getUserId())

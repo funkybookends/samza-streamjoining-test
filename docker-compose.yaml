@@ -10,7 +10,7 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "Users:1:1:compact,UserFollows:1:1:compact"
+      KAFKA_CREATE_TOPICS: "Users:1:1:compact,UserFollows:1:1:compact,UserFollowers:1:1:compact"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     image: wurstmeister/kafka
@@ -51,6 +51,16 @@ services:
       - zookeeper
     ports:
       - "14003:14003"
+    depends_on:
+      - kafka
+      - zookeeper
+  user-followers:
+    build: components/user-followers
+    links:
+      - kafka
+      - zookeeper
+    ports:
+      - "15003:15003"
     depends_on:
       - kafka
       - zookeeper

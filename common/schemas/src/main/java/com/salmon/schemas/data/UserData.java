@@ -21,8 +21,6 @@ public class UserData
 
 	public static UserData merge(final UserData left, final UserData right)
 	{
-		log.info("Merging: " + left.toString() + " with " + right.toString());
-
 		assert left.userId.equals(right.userId);
 
 		return UserData.builder()

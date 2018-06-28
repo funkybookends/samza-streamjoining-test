@@ -54,9 +54,9 @@ public class UserRunner implements ApplicationRunner
 	{
 		this.registerUser();
 		this.registerUser();
-		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::registerUser, 1, 60, TimeUnit.SECONDS);
-		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::tweet, 1, 3, TimeUnit.SECONDS);
-		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::createFollow, 10, 5, TimeUnit.SECONDS);
+		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::registerUser, 5, 60, TimeUnit.SECONDS);
+		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::tweet, 1, 5, TimeUnit.SECONDS);
+		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::createFollow, 10, 20, TimeUnit.SECONDS);
 	}
 
 	private void registerUser()
@@ -90,7 +90,7 @@ public class UserRunner implements ApplicationRunner
 
 			USERS.add(userData);
 
-			LOG.info("New {}", userData);
+			LOG.info("New User: {}", userData);
 		}
 		catch (final Exception exception)
 		{
@@ -117,7 +117,7 @@ public class UserRunner implements ApplicationRunner
 
 			eventProducerBinding.pageViewsOut().send(message);
 
-			LOG.info("User {} tweeted {}", user, tweet);
+			LOG.info("New Tweet: {}", tweet);
 		}
 		catch (final Exception exception)
 		{
@@ -158,7 +158,7 @@ public class UserRunner implements ApplicationRunner
 
 			eventProducerBinding.followRequestsOut().send(message);
 
-			LOG.info("User {} is following {}", first, second);
+			LOG.info("New Follow: {}", followRequest);
 		}
 		catch (final Exception exception)
 		{
