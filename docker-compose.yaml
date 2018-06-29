@@ -64,3 +64,13 @@ services:
     depends_on:
       - kafka
       - zookeeper
+  tweet-pusher:
+    build: components/tweet-pusher
+    links:
+      - kafka
+      - zookeeper
+    ports:
+      - "16003:16003"
+    depends_on:
+      - kafka
+      - zookeeper

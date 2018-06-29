@@ -7,4 +7,5 @@ include ':components:event-producer'
 include ':components:user-tweets'
 include ':components:user-followers'
 include ':components:user-follows'
+include ':components:tweet-pusher'
 
