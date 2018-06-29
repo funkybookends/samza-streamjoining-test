@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.salmon.schemas.data.Tweet;
 import com.salmon.schemas.data.UserData;
+import com.salmon.schemas.data.UserFollowers;
 import com.salmon.schemas.data.UserFollows;
 import com.salmon.schemas.data.UserTweets;
 import com.salmon.schemas.serde.JsonSerde;
@@ -35,7 +36,8 @@ public class UserTweetsJoiner
 	@StreamListener
 	public void createUserTweets(@Input(UserTweetsBinding.TWEETS_IN) KStream<UUID, Tweet> tweetsStream,
 	                             @Input(UserTweetsBinding.USERS_IN) KTable<UUID, UserData> usersTable,
-	                             @Input(UserTweetsBinding.USER_FOLLOWS_IN)KTable<UUID, UserFollows> userFollowsTable
+	                             @Input(UserTweetsBinding.USER_FOLLOWS_IN) KTable<UUID, UserFollows> userFollowsTable,
+	                             @Input(UserTweetsBinding.USER_FOLLOWERS_IN)KTable<UUID, UserFollowers> userFollowersTable
 	)
 	{
 		tweetsStream
